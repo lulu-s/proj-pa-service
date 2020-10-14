@@ -80,7 +80,7 @@
   prompt: 
     - type: text
       msg: |
-        您的旅行已抵达
+        您的旅行已完成
         是否返回起点？
   actions:
     - type: button

@@ -3,13 +3,10 @@ import * as YAML from "yaml"
 import Vue from "vue"
 import route from "route-parser"
 import * as ao from "../util"
-// import * as PinyinMatch from "pinyin-match"
+import pinyin from "chinese-to-pinyin"
 
 
 // 建立数据索引
-// var obj = [];
-// const pinyinEngine = new PinyinEngine(obj);
-
 
 var env = {
     exit: "/exit",
@@ -20,7 +17,8 @@ var env = {
     tem: 0,
     filters: [],
     filter_select: null,
-    input_error: false
+    input_error: false,
+    shade: false
 }
 window.env = env;
 
@@ -47,10 +45,10 @@ function init(message) {
     }
 
     // 建立拼音索引
-    // for(let key in message){
-    //     obj.push(message[key].name)
-    // }
-    // pinyinEngine = new PinyinEngine(obj);
+    for(let key in message){
+        message[key].pinyin = pinyin(message[key].name, {removeTone: true, removeSpace: true})
+    }
+    console.log(message);
 
     env.selected = message[env.que]
     // env.selected.actions != null && env.selected.actions.forEach(ac => {
@@ -81,14 +79,12 @@ function init(message) {
                     env.filter_select = null;
                     env.filters = [];
                     return;
-                } else {
-                    // console.log(pinyinEngine.query(value)) 
                 }
                 if (env.selected.actions != null) {
                     env.filter_select = null;
                     let d = env.selected.actions;
                     for (let i = 0; i < d.length; i++) {
-                        if (d[i].title.indexOf(value) > -1) {
+                        if (d[i].title.indexOf(value) > -1 || this.message[d[i].target].pinyin.indexOf(value) > -1) {
                             env.filter_select = this.message[d[i].target]
                             return;
                         }
@@ -101,8 +97,8 @@ function init(message) {
                     env.filter_select = null;
                     env.filters = [];
                     for (let key in d) {
-                        if (d[key].name.indexOf(value) > -1) {
-                            env.filter_select = d[key]
+                        if (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1) {
+                            env.filter_select == null && (env.filter_select = d[key])
                             env.filters.push( { key, ...d[key] } )
                         }
                     }
@@ -115,6 +111,7 @@ function init(message) {
                 if (env.filter_select != null) {
                     this.add_answer(env.filter_select) 
                     env.filter_select = null;
+                    env.filters = [];
                     this.$refs.input.value = ""
                 } else {
                     // TODO 猜你喜欢
@@ -148,6 +145,9 @@ function init(message) {
             this.$refs.oldlist.addEventListener("touchmove", function (e) {
                 env.ending = true
             })
+            window.addEventListener("mousewheel", function (e) {
+                env.ending = true
+            })
             ao.looperStart();
             ao.loop(() => {
                 // 问答列表滚动
@@ -158,6 +158,8 @@ function init(message) {
                         env.ending = true;
                     }
                 }
+
+                env.shade = this.$refs.oldlist.scrollTop > 0 ? true : false
             })
         }
     })
