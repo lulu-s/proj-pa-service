@@ -1,0 +1,39 @@
+issue:
+  default: |
+    Hi～ 
+    我是AIde 
+    有什么可以帮到您的吗？
+  button: |
+    请选择您需要的选项
+  video: |
+    请观看
+  img: |
+    请观赏
+
+item: 
+  - name: default
+    type: button
+    btn: [金融, 生态圈]
+  - name: 金融
+    type: button
+    btn: [钱交所, 万家医疗]
+  - name: 万家医疗
+    type: video
+  - name: 钱交所
+    type: video
+  - name: 生态圈
+    type: button
+    btn: [生态圈1, 生态圈2]
+  - name: 生态圈1
+    type: button
+    btn: [生态圈1_1, 生态圈1_2]
+  - name: 生态圈1_1
+    type: img
+  - name: 生态圈1_2
+    type: img
+  - name: 生态圈2
+    type: img
+  - name: 生态圈2_1
+    type: img
+  - name: 生态圈2_2
+    type: img

@@ -1,5 +1,94 @@
-issue:
-  - id: 1
-    text:  Hi～ |
-      我是AIde |
-      有什么可以帮到您的吗？
+/index:
+  name: 起点
+  keywords: 
+    - 回到首页
+    - 首页
+    - 开始
+  prompt: 
+    - type: text
+      msg: |
+        Hi～ <br>
+        我是AIde <br>
+        您想去哪里呢？
+    # - type: text
+    #   msg: 您对以下哪方面感兴趣呢？
+  actions:
+    - type: button
+      title: 金融圈
+      target: /tech/finance
+    - type: button
+      title: 生态圈
+      target: /tech/ecosphere
+
+/tech/ecosphere: 
+  name: 生态圈
+  prompt: 
+    - type: text
+      msg: 生态圈 view
+
+/tech/finance: 
+  name: 金融圈
+  prompt: 
+    - type: text
+      msg: 已抵达金融圈
+    - type: text
+      msg: 您对以下哪方面感兴趣呢？
+  actions:
+    - type: button
+      title: 万家医疗
+      target: /finance/1
+    - type: button
+      title: 钱交所
+      target: /finance/2
+
+/finance/1: 
+  name: 万家医疗
+  prompt: 
+    - type: text
+      msg: 万家医疗 view
+
+/finance/2:
+  name: 钱交所 
+  prompt: 
+    - type: text
+      msg: 已抵达钱交所
+    - type: text
+      msg: 您对以下哪方面感兴趣呢？
+  actions:
+    - type: button
+      title: test1
+      target: /test/1
+    - type: button
+      title: test2
+      target: /test/2
+
+
+/test/1: 
+  name: test1
+  prompt: 
+    - type: text
+      msg: 测试1 view
+
+/test/2: 
+  name: test2
+  prompt: 
+    - type: text
+      msg: 测试2 view
+
+/exit: 
+  name: 退出
+  prompt: 
+    - type: text
+      msg: |
+        您的旅行已抵达
+        是否返回起点？
+  actions:
+    - type: button
+      title: 起点
+      target: /index
+
+
+
+# /finance/*:
+#   passThrough: true
+#   prompt: 您对哪方面感兴趣呢？

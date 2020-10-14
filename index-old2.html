@@ -10,14 +10,13 @@
         * {
             margin: 0;
             padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
         body,
         html {
             width: 100%;
             height: 100%;
-            background: #333333;
+            background: #000;
             overflow: hidden;
         }
 
@@ -26,14 +25,14 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            /* background: url(./assets/image/aide_black.png) no-repeat -100px 50px; */
+            background: url(./assets/image/aide_black.png) no-repeat -100px 50px;
         }
 
         .loading {
             position: absolute;
             left: 0;
             top: 0;
-            background: #333333;
+            background: #000;
             animation: fade .4s linear forwards .5s;
             pointer-events: none;
             display: flex;
@@ -103,10 +102,6 @@
             overflow: scroll;
         }
 
-        .old::-webkit-scrollbar {
-            display: none;
-        }
-
         .oldbox {
             opacity: 0;
             animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards;
@@ -124,13 +119,9 @@
             z-index: 2;
         }
 
-        .answer {
+        .old_answer {
             color: #fff;
-            transition: all .4s ease;
             /* animation: move_top .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
-
-            /* display: flex;
-            align-items: center; */
         }
 
         @keyframes move_top {
@@ -155,24 +146,23 @@
             color: #000;
             padding: 8px 15px;
             line-height: 1.5rem;
-            transition: all .4s ease;
         }
 
         .btn {
             display: inline-block;
-            animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) 1s forwards;
+            animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) 2s forwards;
             opacity: 0;
         }
 
-        /* .btnbox {
+        .btnbox {
             display: flex;
             flex-flow: row;
-            
-        } */
+            /* margin: 0 20px; */
+        }
 
         .line {
-            border-radius: 20px;
-            padding: 8px 18px;
+            border-radius: 10px;
+            padding: 5px 10px;
             background: transparent;
             color: #fff;
             /* border: 0; */
@@ -180,18 +170,6 @@
             margin: 5px;
             font-size: 1rem;
             outline: none;
-            transition: all .4s ease;
-        }
-
-        .line:active {
-            color: #333;
-            background: #fff;
-        }
-
-        .select {
-            color: #333;
-            background: #fff;
-            font-weight: bold;
         }
 
         /* ref */
@@ -202,8 +180,6 @@
 
 
         .tips {
-            display: flex;
-            flex-flow: row;
             /* height: 30px; */
             /* display: none; */
             margin: 10px 20px 10px;
@@ -248,18 +224,6 @@
             width: 40%;
 
         }
-
-        .circle {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: pink;
-            position: relative;
-            top: -50px;
-            left: 0;
-            text-align: center;
-            line-height: 30px;
-        }
     </style>
 </head>
 
@@ -269,29 +233,34 @@
     </div>
     <div id="app">
         <div class="component" v-if="env.answer">
-            <div class="old" ref="oldlist">
-                <div class="answer" v-for="pro, i in env.answer"
-                    :style="{'animation-delay': (i + 1) * 0.4 + 0.9 + 's', 'text-align': pro.dir != null ? 'right' : 'left'}">
-                    <!-- opacity: i == env.answer.length - 1 ? 1 : 0.5,  -->
-                    <div :id="i"
-                        :style="{'border-radius': pro.dir != null ? '15px 0px 15px 15px' : '15px 15px 15px 0px'}"
-                        class="text" v-html="pro.msg"> </div>
-                    <!-- <div class="circle">圆</div> -->
+                <div class="old">
+                    <!-- <div class="old" :style="{transform: 'translateY(' + (-(env.old_answer.length + 1) * 15) + 'px)'}"> -->
+                    <div class="old_answer" v-for="pro, i in env.old_answer"
+                        :style="{'animation-delay': (i + 1) * 0.4 + 0.9 + 's', 'text-align': pro.dir != null ? 'right' : 'left'}">
+                        <div :style="{'border-radius': pro.dir != null ? '15px 0px 15px 15px' : '15px 15px 15px 0px'}"
+                            class="text" v-html="pro.msg"> </div>
+                    </div>
                 </div>
-            </div>
         </div>
+        <!-- <div class="">
+            <div class="default" v-for="pro, i in env.answer.prompt"
+                :style="{ 'animation-delay': (i + 1) * 0.4 + 0.9 + 's'}">
+                <div class="text" v-html="pro.msg"></div>
+            </div>
+        </div> -->
         <div class="actions">
             <div class="tips">
-                <div class="btn" v-for="an in env.selected.actions" v-if="an.type == 'button'">
-                    <button class="line" :class="{select: env.filters != null && an.title == env.filters.name ? 1 : 0}"
-                        @click="select(an.target)">{{an.title}}</button>
+                <div class="btnbox">
+                    <div class="btn" v-for="an in env.answer.actions" v-if="an.type == 'button'">
+                        <button class="line" @click="select(an.target)">{{an.title}}</button>
+                    </div>
                 </div>
             </div>
             <div class="inputbox">
-                <input class="input" @input="filter_index" ref="input" placeholder="Type to filter..." type="text">
-                <button @click="input_commit" class="input_btn"><img src="./assets/image/箭头.png" alt=""></button>
-                <div class="error">{{env.err}}</div>
+                <input class="input" placeholder="Type to filter..." type="text">
+                <button class="input_btn"><img src="./assets/image/箭头.png" alt=""></button>
             </div>
+
         </div>
     </div>
 
