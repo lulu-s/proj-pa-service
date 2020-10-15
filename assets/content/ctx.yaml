@@ -1,5 +1,7 @@
 /index:
   name: 起点
+  color: "#99ff33"
+  kind: init
   keywords: 
     - 回到首页
     - 首页
@@ -22,15 +24,21 @@
 
 /tech/ecosphere: 
   name: 生态圈
+  kind: 类目
+  color: "#ff7788"
   prompt: 
     - type: text
       msg: 生态圈 view
 
 /tech/finance: 
   name: 金融圈
+  color: "#ff7788"
+  kind: 类目
   prompt: 
     - type: text
       msg: 已抵达金融圈
+    - type: text
+      msg: 金融圈是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
       msg: 您对以下哪方面感兴趣呢？
   actions:
@@ -41,17 +49,31 @@
       title: 钱交所
       target: /finance/2
 
+"/finance/:any":
+  prompt: 
+    - type: text
+      msg: 您正在查看金融产品${getProduct(any, 'finance').name}
+  passThrough: true
+
 /finance/1: 
   name: 万家医疗
+  color: "#979eff"
+  kind: 产品
   prompt: 
+    - type: text
+      msg: 万家医疗是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
       msg: 万家医疗 view
 
 /finance/2:
   name: 钱交所 
+  color: "#979eff"
+  kind: 产品
   prompt: 
     - type: text
       msg: 已抵达钱交所
+    - type: text
+      msg: 钱交所是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
       msg: 您对以下哪方面感兴趣呢？
   actions:
@@ -65,22 +87,28 @@
 
 /test/1: 
   name: test1
+  color: "#979eff"
+  kind: 产品
   prompt: 
     - type: text
       msg: 测试1 view
 
 /test/2: 
   name: test2
+  kind: 产品
+  color: "#979eff"
   prompt: 
     - type: text
       msg: 测试2 view
 
 /exit: 
   name: 退出
+  color: "#cccccc"
+  kind: 命令
   prompt: 
     - type: text
       msg: |
-        您的旅行已完成
+        您的旅行已抵达
         是否返回起点？
   actions:
     - type: button
@@ -92,3 +120,10 @@
 # /finance/*:
 #   passThrough: true
 #   prompt: 您对哪方面感兴趣呢？
+
+
+"/*":
+  prompt: 
+    - type: text
+      msg: 不好意思，我暂时还不明白
+  passThrough: true
