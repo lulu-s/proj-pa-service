@@ -27,7 +27,7 @@ var env = {
     shade: false, // 控制阴影
     delay: 0.3, // 控制 整体delay
     keyboard: true, // 控制键盘缩放
-    names: [] // 拼音 + name数组
+    pinyins: [] // 拼音数组
 }
 window.env = env;
 
@@ -57,16 +57,9 @@ function init(message) {
     // TODO 中文拼音首字母查找。。。。 https://www.npmjs.com/package/fuzzy
 
     for (let key in message) {
-
-        if (message[key].hasOwnProperty("name")) {
-            // 中文转换成拼音, 并存储到数组
-            message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true })
-
-            // 存储筛查数组
-            env.names.push({ value: message[key].name, key })
-            env.names.push({ value: message[key].pinyin, key })
-        }
-
+        // 中文转换成拼音, 并存储到数组
+        message[key].hasOwnProperty("name") && (message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true })) &&  env.pinyins.push(message[key].pinyin);
+       
         // 遍历颜色和种类，分发到action上
         message[key].hasOwnProperty("actions") && message[key].actions.forEach(v => {
             v.color = message[v.target].color;
@@ -75,13 +68,6 @@ function init(message) {
 
         // 增加route
         message[key].route = new Route(key)
-
-        // key
-        message.key = key
-        message.selece = false;
-
-        env.filters.push({ ...message[key] })
-
     }
 
     // 初始加载 - index
@@ -109,8 +95,6 @@ function init(message) {
             // 模版解析
             ctx(v) {
                 for (let url in this.message) {
-                    console.log(url);
-                    // console.log(this.message[url].route, this.message[url], url);
                     if (this.message[url].route.match(v)) {
                         console.log(url, this.message[url].route.match(v));
                         if (url != v && this.message[v] != null && this.message[url].hasOwnProperty("prompt")) {
@@ -128,15 +112,17 @@ function init(message) {
             },
             // 选择答案
             select(v) {
-                this.ctx(v); // 字符串模范编译
+                this.ctx(v);
+
                 this.$refs.input.value = "";  // 清空输入框
-                env.filters.forEach(v => v.select = false )
+                env.filters = [];  // 清空筛选器
                 env.filter_select = null;
 
                 // 清空历史记录
                 // if(v == "/index") env.answer = [] 
 
                 // 问答列表新增，history增加，开启滚动
+                // env.que = v;
                 this.add_answer(this.message[env.que])
                 history.pushState(env.que, env.que, env.que)
             },
@@ -145,8 +131,7 @@ function init(message) {
                 let value = this.$refs.input.value.toLowerCase()
                 if (value == "") {
                     env.filter_select = null;
-                    env.filters.forEach(v => v.select = false )
-                    console.log(1);
+                    env.filters = [];
                     return;
                 }
                 // 当前答案中查询
@@ -156,42 +141,38 @@ function init(message) {
 
                     // 汇总当前选项拼音 + name
                     let names = [];
-                    d.forEach(v => {
-                        names.push({ value: this.message[v.target].name, key: v.target })
-                        names.push({ value: this.message[v.target].pinyin, key: v.target })
+                    d.forEach(v=>{
+                        names.push(this.message[v.target].pinyin)
+                        names.push(this.message[v.target].name)
                     })
+                    console.log(names);
 
-                    // 筛查
-                    var options = {
-                        extract: function (el) { return el.value; }
-                    };
-                    var results = fuzzy.filter(value, names, options);
-                    var matches = results.map(function (el) { return el.original.key });
-                    var dis = ao.distinct(matches);
-                    env.filter_select = dis.length > 0 ? this.message[dis[0]] : null;
+                    var results = fuzzy.filter('stq', names);
+                    var matches = results.map(function(el) { return el.string; });
+                    console.log(matches);
 
-                    if (!env.filter_select) all(this.message)
+
+
+                    for (let i = 0; i < d.length; i++) {
+                        if (d[i].title.indexOf(value) > -1 || this.message[d[i].target].pinyin.indexOf(value) > -1) {
+                            env.filter_select = this.message[d[i].target]
+                            return;
+                        }
+                    }
+                    if (!env.filter_select) all(this.message);
                 } else {
-                    all(this.message)
+                    all(this.message);
                 }
-
+                // 全局查询
                 function all(d) {
                     env.filter_select = null;
-                    env.filters.forEach(v => v.select = false )
-
-                    // 筛查
-                    var options = {
-                        extract: function (el) { return el.value; }
-                    };
-                    var results = fuzzy.filter(value, env.names, options);
-                    var matches = results.map(function (el) { return el.original.key });
-                    var dis = ao.distinct(matches);
-                    env.filter_select = dis.length > 0 ? d[dis[0]] : null
-                    env.filter_select != null && env.filters.forEach(v => {
-                        for (let i = 0; i < dis.length; i++) {
-                            if (v.name != null && v.name == d[dis[i]].name) v.select = true;
+                    env.filters = [];
+                    for (let key in d) {
+                        if (d[key].hasOwnProperty("name") && (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1)) {
+                            env.filter_select == null && (env.filter_select = d[key])
+                            env.filters.push({ key, ...d[key] })
                         }
-                    })
+                    }
                 }
             },
             // 提交输入的答案
@@ -201,7 +182,7 @@ function init(message) {
                 if (env.filter_select != null) {
                     this.add_answer(env.filter_select)
                     env.filter_select = null;
-                    env.filters.forEach(v => v.select = false )
+                    env.filters = [];
                     this.$refs.input.value = ""
                 } else {
                     // TODO 猜你喜欢

@@ -35,8 +35,8 @@
   color: "#ff7788"
   kind: 类目
   prompt: 
-    - type: text
-      msg: 已抵达金融圈
+    # - type: text
+    #   msg: 已抵达金融圈
     - type: text
       msg: 金融圈是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
@@ -70,8 +70,8 @@
   color: "#979eff"
   kind: 产品
   prompt: 
-    - type: text
-      msg: 已抵达钱交所
+    # - type: text
+    #   msg: 已抵达钱交所
     - type: text
       msg: 钱交所是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
@@ -102,13 +102,13 @@
       msg: 测试2 view
 
 /exit: 
-  name: 退出
+  # name: 退出
   color: "#cccccc"
   kind: 命令
   prompt: 
     - type: text
       msg: |
-        您的旅行已抵达
+        您的旅行已完成
         是否返回起点？
   actions:
     - type: button
@@ -122,8 +122,17 @@
 #   prompt: 您对哪方面感兴趣呢？
 
 
-"/*":
+"/*url":
   prompt: 
     - type: text
       msg: 不好意思，我暂时还不明白
+    - type: text
+      msg: 您是否想去以下几个场景？
+  actions:
+    - type: button
+      title: 金融圈
+      target: /tech/finance
+    - type: button
+      title: 生态圈
+      target: /tech/ecosphere
   passThrough: true
