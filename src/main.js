@@ -1,24 +1,33 @@
 
 import * as YAML from "yaml"
 import Vue from "vue"
-import route from "route-parser"
+import Route from "route-parser"
 import * as ao from "../util"
 import pinyin from "chinese-to-pinyin"
 
+// TODO route
+var route = new Route('/tech/:page');
+console.log(route.match('/tech/finance'));
 
-// 建立数据索引
+// route.match('/my/fancy/route/page/7') // { page: 7 }
+// route.reverse({page: 3}) // -> '/my/fancy/route/page/3'
+// console.log( route.reverse({page: 3}) );
+
 
 var env = {
     exit: "/exit",
     que: "/index",
     selected: [],
+    select: [],
     answer: [],
     ending: false,
     tem: 0,
     filters: [],
     filter_select: null,
     input_error: false,
-    shade: false
+    shade: false,
+    delay: 0.3, // 控制 整体delay
+    keyboard: false // 控制键盘缩放
 }
 window.env = env;
 
@@ -29,13 +38,14 @@ fetch("../assets/content/ctx.yaml")
 
 
 function init(message) {
+    console.log(message);
 
     // 默认事件配置
     {
         window.onpopstate = function (e) {
             env.que = e.state;
             env.answer.splice(env.answer.length - 1, 1);
-            env.selected = message[env.que]
+            env.selected = env.select = message[env.que]
         }
 
         // 刷新恢复当前页面url
@@ -44,16 +54,28 @@ function init(message) {
         // history.state == null && history.pushState(env.que, "", env.que);
     }
 
-    // 建立拼音索引
-    for(let key in message){
-        message[key].pinyin = pinyin(message[key].name, {removeTone: true, removeSpace: true})
+    // TODO 中文拼音首字母查找。。。。 https://www.npmjs.com/package/fuzzy
+    
+    for (let key in message) {
+        // 中文转换成拼音
+        message[key].name != null && (message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true }))
+    
+        // 遍历颜色和种类，分发到action上
+        message[key].actions != null && message[key].actions.forEach(v=>{
+            v.color = message[v.target].color;
+            v.kind = message[v.target].kind;
+        })
     }
-    console.log(message);
 
-    env.selected = message[env.que]
-    // env.selected.actions != null && env.selected.actions.forEach(ac => {
-    //     ac.select = false;
-    // });
+   
+
+
+    // 初始加载 - index
+    env.selected = env.select = message[env.que]
+    env.selected.prompt != null && env.selected.prompt.forEach((pro, i) => {
+        pro.delay = env.delay
+        env.delay += 0.3
+    });
     env.selected.prompt != null && env.answer.push(...env.selected.prompt)
     history.replaceState(env.que, "", env.que);
 
@@ -61,25 +83,37 @@ function init(message) {
         el: "#app",
         data: { env, message },
         methods: {
-            // button 选择后
+             // TODO 缩放键盘
+            display_keyboard(){
+                env.keyboard = !env.keyboard;
+            },
+            // TODO 右上角菜单，切换类型 / 猜你喜欢 
+            cutType(){
+                console.log("猜你喜欢");
+            },
+            // 选择答案
             select(v) {
                 this.$refs.input.value = "";  // 清空输入框
                 env.filters = [];  // 清空筛选器
                 env.filter_select = null;
 
-                // 问答列表新增，history增加， 开启滚动
+                // 清空历史记录
+                // if(v == "/index") env.answer = [] 
+
+                // 问答列表新增，history增加，开启滚动
                 env.que = v;
-                this.add_answer(this.message[v]) 
+                this.add_answer(this.message[v])
                 history.pushState(env.que, env.que, env.que)
             },
             // 索引 模糊查询
             filter_index() {
-                let value = this.$refs.input.value
+                let value = this.$refs.input.value.toLowerCase()
                 if (value == "") {
                     env.filter_select = null;
                     env.filters = [];
                     return;
                 }
+                // 当前答案中查询
                 if (env.selected.actions != null) {
                     env.filter_select = null;
                     let d = env.selected.actions;
@@ -93,29 +127,30 @@ function init(message) {
                 } else {
                     all(this.message);
                 }
+                // 全局查询
                 function all(d) {
                     env.filter_select = null;
                     env.filters = [];
                     for (let key in d) {
-                        if (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1) {
+                        if (d[key].name != null && (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1)) {
                             env.filter_select == null && (env.filter_select = d[key])
-                            env.filters.push( { key, ...d[key] } )
+                            env.filters.push({ key, ...d[key] })
                         }
                     }
                 }
             },
-            // button 提交
+            // 提交输入的答案
             input_commit() {
-                let value = this.$refs.input.value;
+                let value = this.$refs.input.value.toLowerCase();
                 if (value == "") return;
                 if (env.filter_select != null) {
-                    this.add_answer(env.filter_select) 
+                    this.add_answer(env.filter_select)
                     env.filter_select = null;
                     env.filters = [];
                     this.$refs.input.value = ""
                 } else {
                     // TODO 猜你喜欢
-                    this.$refs.input.value = "no result"
+                    this.$refs.input.value = "No result"
                     env.input_error = true;
                     let _this = this;
                     setTimeout(function () {
@@ -124,25 +159,39 @@ function init(message) {
                     }, 2000)
                 }
             },
-            // 问题列表新增
+            // 问题列表新增组合
             add_answer(obj) {
-                env.selected = obj 
+                env.delay = 0.3;
+                env.selected = obj
+                env.select = obj
+                console.log(obj);
                 env.answer.push({ // 新增回答
                     type: "text",
                     msg: env.selected.name,
-                    dir: "right"
+                    dir: "right",
+                    color: env.selected.color,
+                    delay: env.delay
                 })
+                env.selected.prompt.forEach((pro, i) => {
+                    env.delay += 0.3;
+                    pro.delay = env.delay
+                });
                 env.answer.push(...env.selected.prompt) // 新增新问题
                 if (env.selected.actions == null) { // 判断终点
-                    env.selected = this.message[env.exit] 
+                    env.selected = this.message[env.exit]
+                    env.selected.prompt.forEach((pro, i) => {
+                        env.delay += 0.3;
+                        pro.delay = env.delay
+                    });
                     env.answer.push(...env.selected.prompt)
                 }
+                if (env.ending) this.$refs.answerlist.scrollTop = this.$refs.answerlist.scrollHeight + 100
                 env.ending = false;
             }
         },
         mounted() {
             // 手部滑动，问答列表滚动暂停
-            this.$refs.oldlist.addEventListener("touchmove", function (e) {
+            this.$refs.answerlist.addEventListener("touchmove", function (e) {
                 env.ending = true
             })
             window.addEventListener("mousewheel", function (e) {
@@ -152,15 +201,59 @@ function init(message) {
             ao.loop(() => {
                 // 问答列表滚动
                 if (!env.ending) {
-                    env.tem = ao.ease(env.tem, this.$refs.oldlist.scrollHeight, 0.01, 0.1);
-                    this.$refs.oldlist.scrollTop = ao.ease(this.$refs.oldlist.scrollTop, this.$refs.oldlist.scrollHeight, 0.01, 0.1);
-                    if ((this.$refs.oldlist.scrollHeight - env.tem) < 2) {
+                    env.tem = ao.ease(env.tem, this.$refs.answerlist.scrollHeight, 0.01, 0.1);
+                    this.$refs.answerlist.scrollTop = ao.ease(this.$refs.answerlist.scrollTop, this.$refs.answerlist.scrollHeight, 0.01, 0.1);
+                    if ((this.$refs.answerlist.scrollHeight - env.tem) < 200) {
                         env.ending = true;
                     }
                 }
 
-                env.shade = this.$refs.oldlist.scrollTop > 0 ? true : false
+                // 控制头部阴影 - 溢出显示
+                env.shade = this.$refs.answerlist.scrollTop > 0 ? true : false
             })
         }
     })
 }
+
+
+
+// var routes = [];
+// for(var i in ctx) {
+//     routes.push({
+//         r: new Route(i),
+//         ctx: ctx[i]
+//     });
+// }
+
+// function runCTX(ctx, match) {
+//     for(var i in ctx.prompts) {
+//         var str = ctx.prompts[0].msg;
+//         str = magic(str);
+//     }
+//     return ctx.passThrough;
+// }
+
+// function run(path) {
+//     for(var i = 0; i < routes.length; i++) {
+//         if(routes[i].r.match(path)) {
+//             if(!runCTX(routes[i].ctx, routes[i].r.match(path))) {
+//                 break;
+//             }
+//         }
+//     }
+// }
+
+// import template from "es6-template-strings";
+// var methods = {
+//     getProduct: function (key) {
+//         return data.products[key]
+//     }
+// };
+
+// var str = template("您正在查看金融产品${getProduct(any, 'finance')}",{
+//     ...methods,
+//     ...match,
+//     ...local
+// });
+
+// console.log(str)

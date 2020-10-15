@@ -18,6 +18,7 @@
             height: 100%;
             background: #333333;
             overflow: hidden;
+            /* scroll-behavior:smooth; */
         }
 
         #app {
@@ -33,7 +34,7 @@
             left: 0;
             top: 0;
             background: #333333;
-            animation: fade .4s linear forwards .5s;
+            animation: fade .3s linear forwards 1.3s;
             pointer-events: none;
             display: flex;
             justify-content: center;
@@ -41,6 +42,19 @@
             width: 100%;
             height: 100%;
             z-index: 999;
+        }
+
+
+        @keyframes fade {
+            0% {
+                opacity: 1;
+                /* transform: scale(1); */
+            }
+
+            100% {
+                opacity: 0;
+                /* transform: scale(0); */
+            }
         }
 
         .loading img {
@@ -51,28 +65,47 @@
             right: 0;
             margin: auto;
             width: 70%;
+            transform-origin: 50% 50%;
+            animation: aide_scale .6s cubic-bezier(0.14, 0.77, 0.32, 0.82) forwards;
         }
 
-        @keyframes fade {
+        @keyframes aide_scale {
             0% {
-                opacity: 1;
+                opacity: 0;
+                transform: scale(0);
             }
 
             100% {
-                opacity: 0;
+                opacity: 1;
+                transform: scale(1);
             }
         }
 
-        .component {
-            height: 100%;
+        .head {
             width: 100%;
-            /* position: absolute;
-            left: 0;
-            top: 0; */
-            display: flex;
-            flex-flow: column;
-            flex-grow: 1;
-            position: relative;
+            background: #333333;
+            color: #f6921e;
+            transition: all .4s ease;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 15px 15px;
+        }
+
+        .head .targetbox {
+            transition: all .4s ease;
+            font-weight: 300;
+            float: left;
+            font-size: 1.17em;
+            margin-top: -5px;
+        }
+
+        .head .target {
+            font-weight: bold;
+        }
+
+        .head img {
+            float: right;
+            max-width: 15px;
         }
 
         .shade {
@@ -81,25 +114,34 @@
             pointer-events: none;
             background: transparent;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 45px;
             z-index: 2;
         }
 
         .shade_scroll {
-            background: linear-gradient(to bottom, #000 0, rgba(0, 0, 0, 0) 100%);
+            background: linear-gradient(to bottom, #333333 0, rgba(51, 51, 51, 0) 100%);
         }
 
-        .old {
+        .component {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-flow: column;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .answerlist {
             transition: all .4s ease;
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 100%;
             overflow-y: scroll;
+            /* scroll-behavior: smooth; */
         }
-        
-        .old::-webkit-scrollbar {
+
+        .answerlist::-webkit-scrollbar {
             display: none;
         }
 
@@ -120,24 +162,20 @@
             }
         }
 
-
         .answer {
             color: #fff;
-            transition: all .4s ease;
-            /* animation: move_top .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
-
-            /* display: flex;
-            align-items: center; */
+            position: relative;
         }
 
         @keyframes move_top {
             0% {
-                transform: translateY(0);
+                opacity: 0;
+                transform: translateY(30px);
             }
 
             100% {
                 opacity: 1;
-                transform: translateY(-30px);
+                transform: translateY(0);
             }
         }
 
@@ -152,10 +190,14 @@
             line-height: 1.5rem;
             transition: all .4s ease;
             position: relative;
+            letter-spacing: 0.5px;
+            max-width: 350px;
+            opacity: 0;
+            animation: move_top .5s cubic-bezier(0, 0.55, 0.58, 1) forwards;
         }
 
-        .text_left::before,
-        .text_right::before {
+        .text_left,
+        .text_right {
             content: '';
             width: 20px;
             height: 20px;
@@ -164,92 +206,123 @@
             border: 5px solid #f7931e;
             position: absolute;
             background: #000;
+            opacity: 0;
+            animation: move_top .5s cubic-bezier(0, 0.55, 0.58, 1) forwards;
         }
 
-        .text_left::before {
-            left: -15px;
-            bottom: -15px;
+        .text_left {
+            left: 10px;
+            bottom: 0;
         }
 
-        .text_right::before {
-            right: -15px;
-            top: -15px;
+        .text_right {
+            border-color: #00ffff;
+            right: 10px;
+            top: 0;
         }
 
         .btn {
             display: inline-block;
-            animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards;
-            opacity: 0;
+            /* animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
+            /* opacity: 0; */
         }
-
-        /* .btnbox {
-            display: flex;
-            flex-flow: row;
-            
-        } */
 
         .line {
             border-radius: 20px;
             padding: 8px 18px;
             background: transparent;
             color: #fff;
-            /* border: 0; */
             border: 2px solid #fff;
             margin: 5px;
             font-size: 1rem;
             outline: none;
-            transition: all .4s ease;
+            transition: all .4s cubic-bezier(0.08, 0.54, 0.52, 0.65);
             cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
         }
 
-        .line:active {
+        .line:active,
+        .select {
             color: #333;
             background: #fff;
         }
 
         .select {
-            color: #333;
-            background: #fff;
             font-weight: bold;
+        }
+
+        .circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: inline-block;
+            margin-right: 5px;
+            margin-left: -5px;
         }
 
         /* ref */
         .actions {
             width: 100%;
-            /* background: blue; */
         }
 
 
         .tips {
             display: flex;
-            /* flex-flow: row; */
             flex-wrap: wrap;
-            /* height: 30px; */
-            /* display: none; */
+            opacity: 0;
+            transform: scaleY(0);
             margin: 10px 20px 10px;
+        }
+
+        .tips_animation {
+            animation: tips_scale .3s cubic-bezier(0, 0.55, 0.58, 1) forwards;
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes tips_scale {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .inputbox {
             width: 100%;
-            /* height: 120px; */
             display: flex;
             margin-bottom: 20px;
             align-items: center;
             justify-content: center;
-            /* animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
+            transition: all .4s ease;
+            transform-origin: 100% 50%;
+            position: relative;
         }
+
+        .keyboard {
+            position: absolute;
+            right: 20px;
+            bottom: 15px;
+            max-width: 40px;
+        }
+
+        /*  transform: scaleX(0); */
 
         .input {
             width: 75%;
             height: 40px;
-            /* margin: 20px; */
             border-radius: 8px 0px 0px 8px;
             background: #4d4d4d;
             border: 0;
             outline: none;
-            /* padding-left: 20px; */
             padding: 0;
-            padding-left: 10px;
+            padding-left: 15px;
             color: #fff;
             font-size: 1rem;
             font-weight: bold;
@@ -268,7 +341,6 @@
             border-radius: 0px 8px 8px 0px;
             width: 40px;
             height: 40px;
-            /* margin: 20px 20px 0 0; */
             outline: none;
             transition: all .3s ease;
             cursor: pointer;
@@ -281,18 +353,6 @@
         .input_btn img {
             width: 40%;
         }
-
-        .circle {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: pink;
-            position: relative;
-            top: -50px;
-            left: 0;
-            text-align: center;
-            line-height: 30px;
-        }
     </style>
 </head>
 
@@ -301,37 +361,55 @@
         <img src="./assets/image/aide.png" alt="">
     </div>
     <div id="app">
+        <div class="head">
+            <div class="targetbox" :style="{opacity: env.select.name != '起点' ? 1 : 0}">您已抵达 <span class="target">{{env.select.name}}</span>
+            </div>
+            <img @click="cutType" src="./assets/image/menu.png" alt="">
+        </div>
+        <div class="shade" :class="{shade_scroll: env.shade}"></div>
         <div class="component" v-if="env.answer">
-            <div class="shade" :class="{shade_scroll: env.shade}"></div>
-            <div class="old" ref="oldlist">
+            <div class="answerlist" ref="answerlist">
                 <div class="answer" v-for="pro, i in env.answer"
-                    :style="{'animation-delay': (i + 1) * 0.4 + 0.9 + 's', 'text-align': pro.dir != null ? 'right' : 'left'}">
+                    :style="{'animation-delay': pro.delay + 0.5 + 's', 'text-align': pro.dir != null ? 'right' : 'left'}">
                     <div :id="i"
-                        :style="{'border-radius': pro.dir != null ? '15px 0px 15px 15px' : '15px 15px 15px 0px'}"
-                        class="text" :class="{text_right: pro.dir != null , text_left: pro.dir == null }"
-                        v-html="pro.msg"> </div>
+                        :style="{'animation-delay': pro.delay + 0.5 + 0.3 + 's', 'border-radius': pro.dir != null ? '15px 0px 15px 15px' : '15px 15px 15px 0px'}"
+                        class="text" v-html="pro.msg"> </div>
+                    <div :class="{text_right: pro.dir != null , text_left: pro.dir == null}"
+                        :style="{'animation-delay': pro.delay + 0.3 + 's'}"></div>
+                    <!-- <div :class="{text_right: pro.dir != null , text_left: pro.dir == null}" :style="{'animation-delay': pro.delay + 0.3 + 's', 'border-color': pro.dir != null ? pro.color : '#f6921e'}"></div> -->
                 </div>
             </div>
         </div>
         <div class="actions">
-            <div class="tips">
+            <div class="tips" :class="{ 'tips_animation': env.delay && env.ending}"
+                :style="{'animation-delay': env.delay + 's'}">
                 <div class="btn" v-for="an in env.selected.actions" v-if="an.type == 'button'">
                     <button class="line"
                         :class="{select: env.filter_select != null && an.title == env.filter_select.name ? 1 : 0}"
-                        @click="select(an.target)">{{an.title}}</button>
+                        @click="select(an.target)">
+                        <span class="circle" :style="{'border-color': an.color}"></span>
+                        {{an.title}}
+                    </button>
                 </div>
                 <div class="btn" v-for="filter in env.filters">
                     <button class="line"
                         :class="{select: env.filter_select != null && filter.name == env.filter_select.name  ? 1 : 0}"
-                        @click="select(filter.key)">{{filter.name}}</button>
+                        @click="select(filter.key)">
+                        <span class="circle" :style="{'border-color': filter.color}"></span>
+                        {{filter.name}}
+                    </button>
                 </div>
             </div>
-            <div class="inputbox">
-                <input class="input" :class="{input_err: env.input_error}" @input="filter_index" ref="input"
-                    placeholder="Type to filter..." type="text">
-                <button @click="input_commit" class="input_btn"><img src="./assets/image/箭头.png" alt=""></button>
-                <div class="error">{{env.err}}</div>
+            <div>
+                <img @click="display_keyboard" class="keyboard" src="./assets/image/keyboard.png" alt="">
+                <div class="inputbox">
+                    <input class="input" :class="{input_err: env.input_error}" @input="filter_index" ref="input"
+                        placeholder="Type to filter..." type="text">
+                    <button @click="input_commit" class="input_btn"><img src="./assets/image/箭头.png" alt=""></button>
+                </div>
+                
             </div>
+
         </div>
     </div>
 
