@@ -9,9 +9,53 @@ import pinyin from "chinese-to-pinyin"
 var route = new Route('/tech/:page');
 console.log(route.match('/tech/finance'));
 
+window.r = Route;
+
 // route.match('/my/fancy/route/page/7') // { page: 7 }
 // route.reverse({page: 3}) // -> '/my/fancy/route/page/3'
 // console.log( route.reverse({page: 3}) );
+
+
+// var routes = [];
+// for(var i in ctx) {
+//     routes.push({
+//         r: new Route(i),
+//         ctx: ctx[i]
+//     });
+// }
+
+// function runCTX(ctx, match) {
+//     for(var i in ctx.prompts) {
+//         var str = ctx.prompts[0].msg;
+//         str = magic(str);
+//     }
+//     return ctx.passThrough;
+// }
+
+// function run(path) {
+//     for(var i = 0; i < routes.length; i++) {
+//         if(routes[i].r.match(path)) {
+//             if(!runCTX(routes[i].ctx, routes[i].r.match(path))) {
+//                 break;
+//             }
+//         }
+//     }
+// }
+
+// import template from "es6-template-strings";
+// var methods = {
+//     getProduct: function (key) {
+//         return data.products[key]
+//     }
+// };
+
+// var str = template("您正在查看金融产品${getProduct(any, 'finance')}",{
+//     ...methods,
+//     ...match,
+//     ...local
+// });
+
+// console.log(str)
 
 
 var env = {
@@ -55,44 +99,55 @@ function init(message) {
     }
 
     // TODO 中文拼音首字母查找。。。。 https://www.npmjs.com/package/fuzzy
-    
+
     for (let key in message) {
         // 中文转换成拼音
-        message[key].name != null && (message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true }))
-    
+        message[key].hasOwnProperty("name") && (message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true }))
+
         // 遍历颜色和种类，分发到action上
-        message[key].actions != null && message[key].actions.forEach(v=>{
+        message[key].hasOwnProperty("actions") && message[key].actions.forEach(v => {
             v.color = message[v.target].color;
             v.kind = message[v.target].kind;
         })
-    }
 
-   
+        // 增加route
+        message[key].route = new Route(key)
+    }
 
 
     // 初始加载 - index
     env.selected = env.select = message[env.que]
-    env.selected.prompt != null && env.selected.prompt.forEach((pro, i) => {
+    env.selected.hasOwnProperty("prompt") && env.selected.prompt.forEach((pro, i) => {
         pro.delay = env.delay
         env.delay += 0.3
     });
-    env.selected.prompt != null && env.answer.push(...env.selected.prompt)
+    env.selected.hasOwnProperty("prompt") && env.answer.push(...env.selected.prompt)
     history.replaceState(env.que, "", env.que);
 
+    env.msg = message;
     new Vue({
         el: "#app",
         data: { env, message },
         methods: {
-             // TODO 缩放键盘
-            display_keyboard(){
+            // TODO 缩放键盘
+            display_keyboard() {
                 env.keyboard = false;
             },
             // TODO 右上角菜单，切换类型 / 猜你喜欢 
-            cutType(){
+            cutType() {
                 console.log("猜你喜欢");
             },
             // 选择答案
             select(v) {
+
+                for (let url in this.message) {
+                    if(this.message[url].route.match(v)){
+                        console.log(url, this.message[url], this.message[url].route.match(v)); 
+                        env.que = url;
+                        if(!this.message[url].passThrough) break;
+                    }
+                }
+
                 this.$refs.input.value = "";  // 清空输入框
                 env.filters = [];  // 清空筛选器
                 env.filter_select = null;
@@ -101,8 +156,8 @@ function init(message) {
                 // if(v == "/index") env.answer = [] 
 
                 // 问答列表新增，history增加，开启滚动
-                env.que = v;
-                this.add_answer(this.message[v])
+                // env.que = v;
+                this.add_answer(this.message[env.que])
                 history.pushState(env.que, env.que, env.que)
             },
             // 索引 模糊查询
@@ -114,7 +169,7 @@ function init(message) {
                     return;
                 }
                 // 当前答案中查询
-                if (env.selected.actions != null) {
+                if (env.selected.hasOwnProperty("actions")) {
                     env.filter_select = null;
                     let d = env.selected.actions;
                     for (let i = 0; i < d.length; i++) {
@@ -132,7 +187,7 @@ function init(message) {
                     env.filter_select = null;
                     env.filters = [];
                     for (let key in d) {
-                        if (d[key].name != null && (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1)) {
+                        if (d[key].hasOwnProperty("name") && (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1)) {
                             env.filter_select == null && (env.filter_select = d[key])
                             env.filters.push({ key, ...d[key] })
                         }
@@ -164,36 +219,36 @@ function init(message) {
                 env.delay = 0.3;
                 env.selected = obj
                 env.select = obj
-                console.log(obj);
-                env.answer.push({ // 新增回答
+                console.log(env.selected );
+                env.selected.hasOwnProperty("name") && env.answer.push({ // 新增回答
                     type: "text",
                     msg: env.selected.name,
                     dir: "right",
                     color: env.selected.color,
                     delay: env.delay
                 })
-                env.selected.prompt.forEach((pro, i) => {
+                env.selected.hasOwnProperty("prompt") && env.selected.prompt.forEach((pro, i) => {
                     env.delay += 0.3;
                     pro.delay = env.delay
                 });
-                env.answer.push(...env.selected.prompt) // 新增新问题
+                env.selected.hasOwnProperty("prompt") && env.answer.push(...env.selected.prompt) // 新增新问题
                 if (env.selected.actions == null) { // 判断终点
                     env.selected = this.message[env.exit]
-                    env.selected.prompt.forEach((pro, i) => {
+                    env.selected.hasOwnProperty("prompt") && env.selected.prompt.forEach((pro, i) => {
                         env.delay += 0.3;
                         pro.delay = env.delay
                     });
-                    env.answer.push(...env.selected.prompt)
+                    env.selected.hasOwnProperty("prompt") && env.answer.push(...env.selected.prompt)
                 }
                 if (env.ending) this.$refs.answerlist.scrollTop = this.$refs.answerlist.scrollHeight + 100
                 env.ending = false;
             },
-            // 控制键盘
-            keyboard_move(e){
+            // 控制键盘移动
+            keyboard_move(e) {
                 let csslist = ["inputbox", "input", "input_btn", "tran", "keyboard"];
                 let frag = false;
-                for(let i = 0; i < csslist.length; i++) {
-                    if(csslist[i] != e.target.classList[0]){
+                for (let i = 0; i < csslist.length; i++) {
+                    if (csslist[i] != e.target.classList[0]) {
                         frag = true
                     } else {
                         frag = false;
@@ -204,6 +259,10 @@ function init(message) {
             }
         },
         mounted() {
+
+            // test
+            window.sel = this.select
+
             // 控制键盘移动
             document.body.addEventListener("click", this.keyboard_move)
             document.body.addEventListener("touchstart", this.keyboard_move)
@@ -234,44 +293,3 @@ function init(message) {
 }
 
 
-
-// var routes = [];
-// for(var i in ctx) {
-//     routes.push({
-//         r: new Route(i),
-//         ctx: ctx[i]
-//     });
-// }
-
-// function runCTX(ctx, match) {
-//     for(var i in ctx.prompts) {
-//         var str = ctx.prompts[0].msg;
-//         str = magic(str);
-//     }
-//     return ctx.passThrough;
-// }
-
-// function run(path) {
-//     for(var i = 0; i < routes.length; i++) {
-//         if(routes[i].r.match(path)) {
-//             if(!runCTX(routes[i].ctx, routes[i].r.match(path))) {
-//                 break;
-//             }
-//         }
-//     }
-// }
-
-// import template from "es6-template-strings";
-// var methods = {
-//     getProduct: function (key) {
-//         return data.products[key]
-//     }
-// };
-
-// var str = template("您正在查看金融产品${getProduct(any, 'finance')}",{
-//     ...methods,
-//     ...match,
-//     ...local
-// });
-
-// console.log(str)
