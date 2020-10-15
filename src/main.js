@@ -24,10 +24,10 @@ var env = {
     tem: 0,
     filters: [],
     filter_select: null,
-    input_error: false,
-    shade: false,
+    input_error: false, // 控制输入查找失败显示
+    shade: false, // 控制阴影
     delay: 0.3, // 控制 整体delay
-    keyboard: false // 控制键盘缩放
+    keyboard: true // 控制键盘缩放
 }
 window.env = env;
 
@@ -85,7 +85,7 @@ function init(message) {
         methods: {
              // TODO 缩放键盘
             display_keyboard(){
-                env.keyboard = !env.keyboard;
+                env.keyboard = false;
             },
             // TODO 右上角菜单，切换类型 / 猜你喜欢 
             cutType(){
@@ -190,6 +190,21 @@ function init(message) {
             }
         },
         mounted() {
+            // 控制键盘移动
+            let csslist = ["inputbox", "input", "input_btn", "tran", "aide_tran"];
+            document.body.addEventListener("touchstart", function (e){
+                let frag = false;
+                for(let i = 0; i < csslist.length; i++) {
+                    if(csslist[i] != e.target.classList[0]){
+                        frag = true
+                    } else {
+                        frag = false;
+                        break;
+                    }
+                }
+                env.keyboard = frag
+            })
+
             // 手部滑动，问答列表滚动暂停
             this.$refs.answerlist.addEventListener("touchmove", function (e) {
                 env.ending = true

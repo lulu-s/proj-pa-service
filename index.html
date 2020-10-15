@@ -26,7 +26,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            /* background: url(./assets/image/aide_black.png) no-repeat -100px 50px; */
+            background: url(./assets/image/aide_new.png) no-repeat -100px 50px;
         }
 
         .loading {
@@ -297,7 +297,7 @@
         .inputbox {
             width: 100%;
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             align-items: center;
             justify-content: center;
             transition: all .4s ease;
@@ -305,11 +305,29 @@
             position: relative;
         }
 
+
+        .inputbox_animation {
+            transform: translateY(65px);
+        }
+
         .keyboard {
             position: absolute;
             right: 20px;
             bottom: 15px;
             max-width: 40px;
+            transition: all .4s ease;
+        }
+
+        .keyboard_animation {
+           opacity: 0;
+        }
+
+        .aide_tran {
+            position: absolute;
+            left: 20px;
+            bottom: 15px;
+            max-width: 40px;
+            transition: all .4s ease;
         }
 
         /*  transform: scaleX(0); */
@@ -401,11 +419,12 @@
                 </div>
             </div>
             <div>
-                <img @click="display_keyboard" class="keyboard" src="./assets/image/keyboard.png" alt="">
-                <div class="inputbox">
+                <img class="aide_tran" :class="{keyboard_animation: !env.keyboard}" src="./assets/image/aide_tran.png" alt="">
+                <img @click="display_keyboard" class="keyboard" :class="{keyboard_animation: !env.keyboard}" src="./assets/image/keyboard.png" alt="">
+                <div class="inputbox" :class="{inputbox_animation: env.keyboard}">
                     <input class="input" :class="{input_err: env.input_error}" @input="filter_index" ref="input"
                         placeholder="Type to filter..." type="text">
-                    <button @click="input_commit" class="input_btn"><img src="./assets/image/箭头.png" alt=""></button>
+                    <button @click="input_commit" class="input_btn"><img class="tran" src="./assets/image/箭头.png" alt=""></button>
                 </div>
                 
             </div>
