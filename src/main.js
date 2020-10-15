@@ -187,12 +187,10 @@ function init(message) {
                 }
                 if (env.ending) this.$refs.answerlist.scrollTop = this.$refs.answerlist.scrollHeight + 100
                 env.ending = false;
-            }
-        },
-        mounted() {
-            // 控制键盘移动
-            let csslist = ["inputbox", "input", "input_btn", "tran", "aide_tran"];
-            document.body.addEventListener("touchstart", function (e){
+            },
+            // 控制键盘
+            keyboard_move(e){
+                let csslist = ["inputbox", "input", "input_btn", "tran", "keyboard"];
                 let frag = false;
                 for(let i = 0; i < csslist.length; i++) {
                     if(csslist[i] != e.target.classList[0]){
@@ -203,7 +201,12 @@ function init(message) {
                     }
                 }
                 env.keyboard = frag
-            })
+            }
+        },
+        mounted() {
+            // 控制键盘移动
+            document.body.addEventListener("click", this.keyboard_move)
+            document.body.addEventListener("touchstart", this.keyboard_move)
 
             // 手部滑动，问答列表滚动暂停
             this.$refs.answerlist.addEventListener("touchmove", function (e) {
