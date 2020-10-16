@@ -78,11 +78,11 @@
       msg: 您对以下哪方面感兴趣呢？
   actions:
     - type: img
-      src: ./assets/xxx.png
+      src: ../assets/image/xxx.png
       title: test1
       target: /test/1
     - type: img
-      src: ./assets/xxx.png
+      src: ../assets/image/xxx.png
       title: test2
       target: /test/2
 
