@@ -7,8 +7,6 @@ import pinyin from "chinese-to-pinyin"
 import template from "es6-template-strings";
 import fuzzy from "fuzzy"
 
-console.log(fuzzy);
-
 window.fuzzy = fuzzy;
 window.r = Route;
 window.template = template;
@@ -27,7 +25,7 @@ var env = {
     shade: false, // 控制阴影
     delay: 0.3, // 控制 整体delay
     keyboard: true, // 控制键盘缩放
-    pinyins: [] // 拼音数组
+    names: [] // 拼音 + name数组
 }
 window.env = env;
 
@@ -38,7 +36,6 @@ fetch("../assets/content/ctx.yaml")
 
 
 function init(message) {
-    console.log(message);
 
     // 默认事件配置
     {
@@ -54,12 +51,16 @@ function init(message) {
         // history.state == null && history.pushState(env.que, "", env.que);
     }
 
-    // TODO 中文拼音首字母查找。。。。 https://www.npmjs.com/package/fuzzy
-
     for (let key in message) {
-        // 中文转换成拼音, 并存储到数组
-        message[key].hasOwnProperty("name") && (message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true })) &&  env.pinyins.push(message[key].pinyin);
-       
+        if (message[key].hasOwnProperty("name")) {
+            // 中文转换成拼音, 并存储到数组
+            message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true })
+
+            // 存储筛查数组
+            env.names.push({ value: message[key].name, key })
+            env.names.push({ value: message[key].pinyin, key })
+        }
+
         // 遍历颜色和种类，分发到action上
         message[key].hasOwnProperty("actions") && message[key].actions.forEach(v => {
             v.color = message[v.target].color;
@@ -68,6 +69,9 @@ function init(message) {
 
         // 增加route
         message[key].route = new Route(key)
+
+        // key
+        message.key = key
     }
 
     // 初始加载 - index
@@ -122,7 +126,6 @@ function init(message) {
                 // if(v == "/index") env.answer = [] 
 
                 // 问答列表新增，history增加，开启滚动
-                // env.que = v;
                 this.add_answer(this.message[env.que])
                 history.pushState(env.que, env.que, env.que)
             },
@@ -141,37 +144,40 @@ function init(message) {
 
                     // 汇总当前选项拼音 + name
                     let names = [];
-                    d.forEach(v=>{
-                        names.push(this.message[v.target].pinyin)
-                        names.push(this.message[v.target].name)
+                    d.forEach(v => {
+                        names.push({ value: this.message[v.target].name, key: v.target })
+                        names.push({ value: this.message[v.target].pinyin, key: v.target })
                     })
-                    console.log(names);
 
-                    var results = fuzzy.filter('stq', names);
-                    var matches = results.map(function(el) { return el.string; });
-                    console.log(matches);
+                    // 筛查
+                    var options = {
+                        extract: function (el) { return el.value; }
+                    };
+                    var results = fuzzy.filter(value, names, options);
+                    var matches = results.map(function (el) { return el.original.key });
+                    var dis = ao.distinct(matches);
+                    env.filter_select = dis.length > 0 ? this.message[dis[0]] : null;
 
-
-
-                    for (let i = 0; i < d.length; i++) {
-                        if (d[i].title.indexOf(value) > -1 || this.message[d[i].target].pinyin.indexOf(value) > -1) {
-                            env.filter_select = this.message[d[i].target]
-                            return;
-                        }
-                    }
-                    if (!env.filter_select) all(this.message);
+                    if (!env.filter_select) all(this.message)
                 } else {
-                    all(this.message);
+                    all(this.message)
                 }
-                // 全局查询
+
                 function all(d) {
                     env.filter_select = null;
                     env.filters = [];
-                    for (let key in d) {
-                        if (d[key].hasOwnProperty("name") && (d[key].name.indexOf(value) > -1 || d[key].pinyin.indexOf(value) > -1)) {
-                            env.filter_select == null && (env.filter_select = d[key])
-                            env.filters.push({ key, ...d[key] })
-                        }
+
+                    // 筛查
+                    var options = {
+                        extract: function (el) { return el.value; }
+                    };
+                    var results = fuzzy.filter(value, env.names, options);
+                    var matches = results.map(function (el) { return el.original.key });
+                    var dis = ao.distinct(matches);
+                    console.log(dis);
+                    for(let i = 0; i < dis.length; i++){
+                        i == 0 && (env.filter_select = d[dis[i]])
+                        env.filters.push({ key: dis[i], ...d[dis[i]] })
                     }
                 }
             },

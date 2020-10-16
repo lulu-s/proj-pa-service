@@ -1,4 +1,3 @@
-
 import * as YAML from "yaml"
 import Vue from "vue"
 import Route from "route-parser"
@@ -6,6 +5,8 @@ import * as ao from "../util"
 import pinyin from "chinese-to-pinyin"
 import template from "es6-template-strings";
 import fuzzy from "fuzzy"
+
+console.log(fuzzy);
 
 window.fuzzy = fuzzy;
 window.r = Route;
@@ -36,6 +37,7 @@ fetch("../assets/content/ctx.yaml")
 
 
 function init(message) {
+    console.log(message);
 
     // 默认事件配置
     {
@@ -51,7 +53,10 @@ function init(message) {
         // history.state == null && history.pushState(env.que, "", env.que);
     }
 
+    // TODO 中文拼音首字母查找。。。。 https://www.npmjs.com/package/fuzzy
+
     for (let key in message) {
+
         if (message[key].hasOwnProperty("name")) {
             // 中文转换成拼音, 并存储到数组
             message[key].pinyin = pinyin(message[key].name, { removeTone: true, removeSpace: true })
@@ -71,7 +76,11 @@ function init(message) {
         message[key].route = new Route(key)
 
         // key
-        message[key].key = key
+        message.key = key
+        message.selece = false;
+
+        env.filters.push({ ...message[key] })
+
     }
 
     // 初始加载 - index
@@ -99,6 +108,8 @@ function init(message) {
             // 模版解析
             ctx(v) {
                 for (let url in this.message) {
+                    console.log(url);
+                    // console.log(this.message[url].route, this.message[url], url);
                     if (this.message[url].route.match(v)) {
                         console.log(url, this.message[url].route.match(v));
                         if (url != v && this.message[v] != null && this.message[url].hasOwnProperty("prompt")) {
@@ -116,10 +127,9 @@ function init(message) {
             },
             // 选择答案
             select(v) {
-                this.ctx(v);
-
+                this.ctx(v); // 字符串模范编译
                 this.$refs.input.value = "";  // 清空输入框
-                env.filters = [];  // 清空筛选器
+                env.filters.forEach(v => v.select = false )
                 env.filter_select = null;
 
                 // 清空历史记录
@@ -134,7 +144,8 @@ function init(message) {
                 let value = this.$refs.input.value.toLowerCase()
                 if (value == "") {
                     env.filter_select = null;
-                    env.filters = [];
+                    env.filters.forEach(v => v.select = false )
+                    console.log(1);
                     return;
                 }
                 // 当前答案中查询
@@ -165,7 +176,7 @@ function init(message) {
 
                 function all(d) {
                     env.filter_select = null;
-                    env.filters = [];
+                    env.filters.forEach(v => v.select = false )
 
                     // 筛查
                     var options = {
@@ -174,10 +185,12 @@ function init(message) {
                     var results = fuzzy.filter(value, env.names, options);
                     var matches = results.map(function (el) { return el.original.key });
                     var dis = ao.distinct(matches);
-                    for(let i = 0; i < dis.length; i++){
-                        i == 0 && (env.filter_select = d[dis[i]])
-                        env.filters.push({ key: dis[i], ...d[dis[i]] })
-                    }
+                    env.filter_select = dis.length > 0 ? d[dis[0]] : null
+                    env.filter_select != null && env.filters.forEach(v => {
+                        for (let i = 0; i < dis.length; i++) {
+                            if (v.name != null && v.name == d[dis[i]].name) v.select = true;
+                        }
+                    })
                 }
             },
             // 提交输入的答案
@@ -187,7 +200,7 @@ function init(message) {
                 if (env.filter_select != null) {
                     this.add_answer(env.filter_select)
                     env.filter_select = null;
-                    env.filters = [];
+                    env.filters.forEach(v => v.select = false )
                     this.$refs.input.value = ""
                 } else {
                     // TODO 猜你喜欢
@@ -281,5 +294,3 @@ function init(message) {
         }
     })
 }
-
-

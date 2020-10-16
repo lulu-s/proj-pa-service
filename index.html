@@ -221,47 +221,7 @@
             top: 0;
         }
 
-        .btn {
-            display: inline-block;
-            /* animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
-            /* opacity: 0; */
-        }
 
-        .line {
-            border-radius: 20px;
-            padding: 8px 18px;
-            background: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-            margin: 5px;
-            font-size: 1rem;
-            outline: none;
-            transition: all .4s cubic-bezier(0.08, 0.54, 0.52, 0.65);
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .line:active,
-        .select {
-            color: #333;
-            background: #fff;
-        }
-
-        .select {
-            font-weight: bold;
-        }
-
-        .circle {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            display: inline-block;
-            margin-right: 5px;
-            margin-left: -5px;
-        }
 
         /* ref */
         .actions {
@@ -294,6 +254,7 @@
             }
         }
 
+        /* 输入框 */
         .inputbox {
             width: 100%;
             display: flex;
@@ -319,7 +280,7 @@
         }
 
         .keyboard_animation {
-           opacity: 0;
+            opacity: 0;
         }
 
         .aide_tran {
@@ -345,6 +306,8 @@
             font-size: 1rem;
             font-weight: bold;
             transition: all .3s ease;
+            box-shadow: 9px 5px 11px -3px #000;
+            /* 9px 5px 11px -5px #000; */
         }
 
         .input_err {
@@ -362,6 +325,8 @@
             outline: none;
             transition: all .3s ease;
             cursor: pointer;
+            box-shadow: 1px 8px 14px -9px #000;
+            /* 1px 8px 8px -9px #000; */
         }
 
         .input_btn:active {
@@ -371,7 +336,150 @@
         .input_btn img {
             width: 40%;
         }
+
+        /* shadebox */
+        .shadebox {
+            width: 100%;
+            height: 100%;
+            background: #f6921e;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: all .4s ease;
+            transform: rotate(25deg) translate(-180px, -50px);
+            border-radius: 30px;
+        }
+
+        /* .shadebox::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+        } */
+
+
+        /* component */
+
+        /* button */
+        .btn {
+            display: inline-block;
+            /* animation: move_bottom .5s cubic-bezier(0, 0.55, 0.58, 1) forwards; */
+            /* opacity: 0; */
+        }
+
+        .line {
+            border-radius: 30px;
+            padding: 8px 13px 8px 18px;
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            margin: 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: all .4s cubic-bezier(0.08, 0.54, 0.52, 0.65);
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            flex-flow: column;
+            position: relative;
+        }
+
+        .line:active,
+        .select {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0);
+        }
+
+        .btnbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .kind {
+            font-size: 10px;
+            /* position: absolute;
+            bottom: -4px;
+            left: 50%; */
+            transform: scale(0.8);
+            margin-left: 2px;
+            /* transform: translateX(-50%) scale(0.8); */
+        }
+
+        .select {
+            font-weight: bold;
+        }
+
+        .circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            display: inline-block;
+            margin-right: 5px;
+            margin-left: -5px;
+            transition: all .3s ease;
+        }
+
+        .select .circle {
+            /* background: #333; */
+        }
+
+        /* img */
+        .ac_img_box {
+            width: 80px;
+            height: 100px;
+            background-color: #f6921e;
+            border-radius: 10px;
+            color: #000;
+            margin: 5px;
+            transition: all .4s cubic-bezier(0.08, 0.54, 0.52, 0.65);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            background-size: 100% 100%;
+            background-size: cover;
+            color: #fff;
+            position: relative;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        }
+
+        .ac_img {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            margin: auto;
+            max-width: 70px;
+            transition: all .4s ease;
+        }
+
+        .ac_text {
+            background: rgba(0, 0, 0, 0.6);
+            /* border: 1px solid rgba(0, 0, 0, 0.6); */
+            display: block;
+            width: 100%;
+            text-align: center;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            /* margin: 5px; */
+            padding: 5px;
+            position: relative;
+            transition: all .4s cubic-bezier(0.08, 0.54, 0.52, 0.65);
+        }
+
+        .ac_img_box:active .ac_text {
+            background: rgba(0, 0, 0, 1);
+        }
     </style>
+
+
 </head>
 
 <body>
@@ -380,7 +488,9 @@
     </div>
     <div id="app">
         <div class="head">
-            <div class="targetbox" :style="{opacity: env.select.name != '起点' && env.select.hasOwnProperty('name') ? 1 : 0}">您已抵达 <span class="target">{{env.select.name}}</span>
+            <div class="targetbox"
+                :style="{opacity: env.select.name != '起点' && env.select.hasOwnProperty('name') ? 1 : 0}">您已抵达 <span
+                    class="target">{{env.select.name}}</span>
             </div>
             <img @click="cutType" src="./assets/image/menu.png" alt="">
         </div>
@@ -405,31 +515,57 @@
                     <button class="line"
                         :class="{select: env.filter_select != null && an.title == env.filter_select.name ? 1 : 0}"
                         @click="select(an.target)">
-                        <span class="circle" :style="{'border-color': an.color}"></span>
-                        {{an.title}}
+                        <div class="btnbox">
+                            <span class="circle" :style="{'border-color': an.color}"></span>
+                            {{an.title}}
+                        </div>
                     </button>
                 </div>
-                <div class="btn" v-for="filter in env.filters" v-if="filter.name != null" :style="{opacity: filter.select ? 1 : 0}">
+                <div class="ac_img_box" v-for="an in env.selected.actions" v-if="an.type == 'img'"
+                    @click="select(an.target)">
+                    <!-- :style="{'background-image': `url(${an.src})`}"  @click="select(an.target)"> -->
+                    <!-- <div> -->
+                    <img class="ac_img" :src="an.src" alt="">
+                    <span class="ac_text">{{an.title}}</span>
+                    <!-- </div> -->
+                </div>
+                <div class="btn" v-for="filter in env.filters">
+                    <button class="line"
+                        :class="{select: env.filter_select != null && filter.name == env.filter_select.name  ? 1 : 0}"
+                        @click="select(filter.key)">
+                        <div class="btnbox">
+                            <span class="circle" :style="{'border-color': filter.color}"></span>
+                            {{filter.name}}
+                            <span :style="{'color': filter.color}" class="kind">{{filter.kind}}</span> </div>
+                    </button>
+                </div>
+                <!-- <div class="btn" v-for="filter in env.filters" v-if="filter.name != null && filter.select" :style="{opacity: filter.select ? 1 : 0}">
                     <button class="line"
                         :class="{select: env.filter_select != null && filter.name == env.filter_select.name  ? 1 : 0}"
                         @click="select(filter.key)">
                         <span class="circle" :style="{'border-color': filter.color}"></span>
                         {{filter.name}}
                     </button>
-                </div>
+                </div> -->
             </div>
             <div>
-                <img class="aide_tran" :class="{keyboard_animation: !env.keyboard}" src="./assets/image/aide_tran.png" alt="">
-                <img @click="display_keyboard" class="keyboard" :class="{keyboard_animation: !env.keyboard}" src="./assets/image/keyboard.png" alt="">
+                <img class="aide_tran" :class="{keyboard_animation: !env.keyboard}" src="./assets/image/aide_tran.png"
+                    alt="">
+                <img @click="display_keyboard" class="keyboard" :class="{keyboard_animation: !env.keyboard}"
+                    src="./assets/image/keyboard.png" alt="">
                 <div class="inputbox" :class="{inputbox_animation: env.keyboard}">
                     <input class="input" :class="{input_err: env.input_error}" @input="filter_index" ref="input"
                         placeholder="Type to filter..." type="text">
-                    <button @click="input_commit" class="input_btn"><img class="tran" src="./assets/image/箭头.png" alt=""></button>
+                    <button @click="input_commit" class="input_btn"><img class="tran" src="./assets/image/箭头.png"
+                            alt=""></button>
                 </div>
-                
+
             </div>
 
         </div>
+        <!-- <div class="shadebox">
+            猜你喜欢
+        </div> -->
     </div>
 
     <script src="./src/main.js"></script>

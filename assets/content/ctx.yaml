@@ -25,20 +25,20 @@
 /tech/ecosphere: 
   name: 生态圈
   kind: 类目
-  color: "#ff7788"
+  color: "#ffff88"
   prompt: 
     - type: text
       msg: 生态圈 view
 
 /tech/finance: 
   name: 金融圈
-  color: "#ff7788"
+  color: "#ffff88"
   kind: 类目
   prompt: 
     # - type: text
     #   msg: 已抵达金融圈
     - type: text
-      msg: 金融圈是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
+      msg: 金融圈是介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍
     - type: text
       msg: 您对以下哪方面感兴趣呢？
   actions:
@@ -46,18 +46,18 @@
       title: 万家医疗
       target: /finance/1
     - type: button
-      title: 钱交所
+      title: 前交所
       target: /finance/2
 
 "/finance/:any":
   prompt: 
     - type: text
-      msg: 您正在查看金融产品${getProduct(any, 'finance').name}
+      msg: 已抵达${name}  # ${getProduct(any, 'finance').name}
   passThrough: true
 
 /finance/1: 
   name: 万家医疗
-  color: "#979eff"
+  color: "#00ccff"
   kind: 产品
   prompt: 
     - type: text
@@ -66,28 +66,30 @@
       msg: 万家医疗 view
 
 /finance/2:
-  name: 钱交所 
-  color: "#979eff"
+  name: 前交所 
+  color: "#ffcc00"
   kind: 产品
   prompt: 
     # - type: text
-    #   msg: 已抵达钱交所
+    #   msg: 已抵达前交所
     - type: text
-      msg: 钱交所是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
+      msg: 前交所是生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈金融生态圈
     - type: text
       msg: 您对以下哪方面感兴趣呢？
   actions:
-    - type: button
+    - type: img
+      src: ./assets/xxx.png
       title: test1
       target: /test/1
-    - type: button
+    - type: img
+      src: ./assets/xxx.png
       title: test2
       target: /test/2
 
 
 /test/1: 
   name: test1
-  color: "#979eff"
+  color: "#cc9eff"
   kind: 产品
   prompt: 
     - type: text
@@ -96,7 +98,7 @@
 /test/2: 
   name: test2
   kind: 产品
-  color: "#979eff"
+  color: "#cc9eff"
   prompt: 
     - type: text
       msg: 测试2 view
@@ -114,7 +116,6 @@
     - type: button
       title: 起点
       target: /index
-
 
 
 # /finance/*:
