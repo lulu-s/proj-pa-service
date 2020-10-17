@@ -7,12 +7,15 @@ import pinyin from "chinese-to-pinyin"
 import template from "es6-template-strings";
 import fuzzy from "fuzzy"
 
-window.fuzzy = fuzzy;
-window.r = Route;
-window.template = template;
+import * as scene from "./scene"
+
+// window.fuzzy = fuzzy;
+// window.r = Route;
+// window.template = template;
 
 var env = {
     exit: "/exit",
+    index: "/index",
     que: "/index",
     selected: [],
     select: [],
@@ -25,7 +28,8 @@ var env = {
     shade: false, // 控制阴影
     delay: 0.3, // 控制 整体delay
     keyboard: true, // 控制键盘缩放
-    names: [] // 拼音 + name数组
+    names: [], // 拼音 + name数组
+    shadebox: false // 控制猜你喜欢
 }
 window.env = env;
 
@@ -83,18 +87,19 @@ function init(message) {
     env.selected.hasOwnProperty("prompt") && env.answer.push(...env.selected.prompt)
     history.replaceState(env.que, "", env.que);
 
-    env.msg = message;
+    window.msg = message;
     new Vue({
         el: "#app",
         data: { env, message },
         methods: {
-            // TODO 缩放键盘
+            // 缩放键盘
             display_keyboard() {
+                env.shadebox = false;
                 env.keyboard = false;
             },
             // TODO 右上角菜单，切换类型 / 猜你喜欢 
             cutType() {
-                console.log("猜你喜欢");
+                env.shadebox = !env.shadebox;
             },
             // 模版解析
             ctx(v) {
@@ -116,6 +121,7 @@ function init(message) {
             },
             // 选择答案
             select(v) {
+                env.shadebox = false;
                 this.ctx(v);
 
                 this.$refs.input.value = "";  // 清空输入框
@@ -182,6 +188,7 @@ function init(message) {
             },
             // 提交输入的答案
             input_commit() {
+                env.shadebox = false;
                 let value = this.$refs.input.value.toLowerCase();
                 if (value == "") return;
                 if (env.filter_select != null) {
@@ -249,6 +256,9 @@ function init(message) {
             }
         },
         mounted() {
+            console.log(this.message);
+
+            scene.init();
 
             // test
             window.sel = this.select
@@ -277,6 +287,9 @@ function init(message) {
 
                 // 控制头部阴影 - 溢出显示
                 env.shade = this.$refs.answerlist.scrollTop > 0 ? true : false
+
+                // canvas
+                scene.loop();
             })
         }
     })
