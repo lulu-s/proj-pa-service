@@ -64,7 +64,8 @@
             bottom: 0;
             right: 0;
             margin: auto;
-            width: 70%;
+            width: calc(100% * 0.4);
+            /* width: 70%; */
             transform-origin: 50% 50%;
             animation: aide_scale .6s cubic-bezier(0.14, 0.77, 0.32, 0.82) forwards;
         }
@@ -106,6 +107,11 @@
         .head img {
             float: right;
             max-width: 15px;
+        }
+
+        .menu {
+            position: relative;
+            z-index: 900;
         }
 
         .shade {
@@ -163,7 +169,7 @@
         }
 
         .answer {
-            color: #fff;
+            color: #e6e6e6;
             position: relative;
         }
 
@@ -185,7 +191,7 @@
             display: inline-block;
             background: rgba(255, 255, 255, 1);
             border-radius: 10px 10px 10px 0px;
-            color: #000;
+            color: #333;
             padding: 8px 15px;
             line-height: 1.5rem;
             transition: all .4s ease;
@@ -205,7 +211,7 @@
             background: transparent;
             border: 5px solid #f7931e;
             position: absolute;
-            background: #000;
+            background: #333;
             opacity: 0;
             animation: move_top .5s cubic-bezier(0, 0.55, 0.58, 1) forwards;
         }
@@ -277,6 +283,7 @@
             bottom: 15px;
             max-width: 35px;
             transition: all .4s ease;
+            user-select: none;
         }
 
         .keyboard_animation {
@@ -302,7 +309,7 @@
             outline: none;
             padding: 0;
             padding-left: 15px;
-            color: #fff;
+            color: #e6e6e6;
             font-size: 1rem;
             font-weight: bold;
             transition: all .3s ease;
@@ -326,40 +333,17 @@
             transition: all .3s ease;
             cursor: pointer;
             box-shadow: 1px 8px 14px -9px #000;
-            /* 1px 8px 8px -9px #000; */
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(230, 230, 230, 0);
         }
 
         .input_btn:active {
-            background: #fff;
+            background: #e6e6e6;
         }
 
         .input_btn img {
             width: 40%;
         }
-
-        /* shadebox */
-        .shadebox {
-            width: 100%;
-            height: 100%;
-            background: #f6921e;
-            position: absolute;
-            left: 0;
-            top: 0;
-            transition: all .4s ease;
-            transform: rotate(25deg) translate(-180px, -50px);
-            border-radius: 30px;
-        }
-
-        /* .shadebox::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-        } */
-
 
         /* component */
 
@@ -374,8 +358,8 @@
             border-radius: 30px;
             padding: 8px 13px 8px 18px;
             background: transparent;
-            color: #fff;
-            border: 2px solid #fff;
+            color: #e6e6e6;
+            border: 2px solid #e6e6e6;
             margin: 5px;
             font-size: 1rem;
             outline: none;
@@ -386,13 +370,15 @@
             align-items: center;
             flex-flow: column;
             position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(230, 230, 230, 0);
         }
 
         .line:active,
         .select {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0);
+            color: #e6e6e6;
+            background: rgba(230, 230, 230, 0.3);
+            border-color: rgba(230, 230, 230, 0);
         }
 
         .btnbox {
@@ -418,7 +404,7 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            border: 3px solid #fff;
+            border: 3px solid #e6e6e6;
             display: inline-block;
             margin-right: 5px;
             margin-left: -5px;
@@ -464,6 +450,180 @@
         .ac_img_box:active .ac_text {
             background: rgba(51, 51, 51, 1);
         }
+
+
+        /* shadebox */
+        .shadebox {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: all .4s ease;
+            pointer-events: none;
+            z-index: 3;
+            overflow: hidden;
+            transition: all .3s cubic-bezier(0.25, 0.1, 0.41, 0.77);
+        }
+
+        .shadebox_animation {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .shade_bg {
+            position: absolute;
+            top: -55px;
+            left: -87%;
+            max-height: 90%;
+            transform: rotate(-30deg) scale(0);
+            transform-origin: 0 0;
+            transition: all .6s cubic-bezier(0.54, 0.32, 0.08, 1.11);
+        }
+
+        .shade_bg_animation {
+            transform: rotate(0deg) scale(1.1);
+            opacity: 1;
+        }
+
+        /* 
+        .shade_bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            max-height: 90%;
+            transform: translate(-150%, -30%) scale(0);
+            max-width: 100%;
+            transform-origin: 0 0;
+            transition: all .6s cubic-bezier(0.54, 0.32, 0.08, 1.11);
+        } */
+
+        #canvas {
+            display: none;
+        }
+
+        /* 
+        .shade_bg_animation {
+            transform: translate(-150%, -30%) scale(2.5);
+            opacity: 1;
+        } */
+
+        .shade_text {
+            position: relative;
+            color: #e6e6e6;
+            margin: 40px;
+            transition: all .4s cubic-bezier(0.08, 0.42, 0.51, 0.79);
+        }
+
+        .shade_text h2 {
+            opacity: 0;
+            animation: shade_move_top .3s cubic-bezier(0.29, 0.53, 0.34, 0.79) forwards 0.5s;
+        }
+
+        @keyframes shade_move_top {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shade_option_box {
+            pointer-events: all;
+            margin-top: 50px;
+            display: flex;
+            flex-flow: column;
+        }
+
+        .shade_option {
+            margin-bottom: 35px;
+            transition: all .4s cubic-bezier(0.08, 0.42, 0.51, 0.79);
+            opacity: 0;
+            animation: shade_move_left .2s cubic-bezier(0.06, 0.43, 0.43, 0.44) forwards;
+            animation-delay: 1.4s;
+        }
+
+        @keyframes shade_move_left {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px) scale(1.3);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .shade_option_text {
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6e6e6;
+            font-size: 1.1rem;
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(230, 230, 230, 0);
+            transition: all .4s cubic-bezier(0.08, 0.42, 0.51, 0.79);
+            user-select: none;
+        }
+
+
+        .shade_option_text:active {
+            color: #333;
+            border-bottom: 2px solid #333;
+        }
+
+        @media screen and (max-width: 375px) and (min-height: 780px) {
+            .shade_bg {
+                left: -115%;
+            }
+        }
+
+        @media only screen and (device-width: 414px) and (device-height: 896px) {
+            .shade_bg {
+                top: -165px;
+                left: -80%;
+            }
+
+            .shade_bg_animation {
+                transform: rotate(8deg) scale(1.2);
+            }
+        }
+
+        @media screen and (min-height: 1024px) {
+            .shade_bg {
+                top: -315px;
+                left: -65%;
+            }
+
+            .shade_bg_animation {
+                transform: rotate(8deg) scale(1.3);
+            }
+        }
+
+        @media screen and (min-height: 1025px) {
+            .shade_bg {
+                top: -410px;
+                left: -65%;
+            }
+
+            .shade_bg_animation {
+                transform: rotate(8deg) scale(1.3);
+            }
+        }
+
+        @media all and (orientation : landscape) {
+            .shade_bg {
+                top: -450px;
+                left: -24%;
+                transform-origin: 0 50%;
+            }
+
+            .shade_bg_animation {
+                transform: rotate(40deg) scale(2.5);
+            }
+        }
     </style>
 
 
@@ -479,7 +639,7 @@
                 :style="{opacity: env.select.name != '起点' && env.select.hasOwnProperty('name') ? 1 : 0}">您已抵达 <span
                     class="target">{{env.select.name}}</span>
             </div>
-            <img @click="cutType" src="./assets/image/menu.png" alt="">
+            <img class="menu" @click="cutType" src="./assets/image/menu.png" alt="">
         </div>
         <div class="shade" :class="{shade_scroll: env.shade}"></div>
         <div class="component" v-if="env.answer">
@@ -546,13 +706,27 @@
                     <button @click="input_commit" class="input_btn"><img class="tran" src="./assets/image/箭头.png"
                             alt=""></button>
                 </div>
+            </div>
+        </div>
+        <div class="shadebox" :class="{shadebox_animation: env.shadebox}">
 
+            <!-- <img class="shade_bg" :class="{shade_bg_animation: env.shadebox}" src="./assets/image/bg.png" alt=""> -->
+            <img class="shade_bg" :class="{shade_bg_animation: env.shadebox}" src="./assets/image/big_bg.png" alt="">
+            <canvas id="canvas"></canvas>
+            <div class="shade_text" v-if="env.shadebox" :style="{opacity: env.shadebox ? 1 : 0}">
+                <h2>我猜你可能想问...</h2>
+                <div class="shade_option_box">
+                    <div class="shade_option" v-for="(ac, i) in message[env.index].actions"
+                        :style="{'animation-delay': i * 0.25 + 0.8 + 's'}">
+                        <span @click="select(ac.target)" class="shade_option_text">{{ac.title}}</span>
+                    </div>
+                    <!-- <div class="shade_option"><span class="shade_option_text">五大生态圈</span> </div>
+                    <div class="shade_option"><span class="shade_option_text">技术看板</span></div>
+                    <div class="shade_option"><span class="shade_option_text">应用案例</span></div> -->
+                </div>
             </div>
 
         </div>
-        <!-- <div class="shadebox">
-            猜你喜欢
-        </div> -->
     </div>
 
     <script src="./src/main.js"></script>
