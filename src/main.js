@@ -65,6 +65,18 @@ function init(message) {
             env.names.push({ value: message[key].pinyin, key })
         }
 
+        // 存储关键字
+        if (message[key].hasOwnProperty("keywords")) {
+            let pys = [];
+            message[key].keywords.forEach(v => {
+                env.names.push({ value: v, key })
+                let py = pinyin(v, { removeTone: true, removeSpace: true })
+                pys.push(py)
+                env.names.push({ value: py, key })
+            })
+            message[key].pinyins = pys
+        }
+
         // 遍历颜色和种类，分发到action上
         message[key].hasOwnProperty("actions") && message[key].actions.forEach(v => {
             v.color = message[v.target].color;
@@ -81,9 +93,10 @@ function init(message) {
     // 初始加载 - index
     env.selected = env.select = message[env.que]
     env.selected.hasOwnProperty("prompt") && env.selected.prompt.forEach((pro, i) => {
-        pro.delay = env.delay
+        pro.delay = env.delay + 3.5
         env.delay += 0.3
     });
+    env.delay += 3
     env.selected.hasOwnProperty("prompt") && env.answer.push(...env.selected.prompt)
     history.replaceState(env.que, "", env.que);
 
@@ -122,6 +135,7 @@ function init(message) {
             // 选择答案
             select(v) {
                 env.shadebox = false;
+                env.keyboard = false;
                 this.ctx(v);
 
                 this.$refs.input.value = "";  // 清空输入框
@@ -151,8 +165,18 @@ function init(message) {
                     // 汇总当前选项拼音 + name
                     let names = [];
                     d.forEach(v => {
-                        names.push({ value: this.message[v.target].name, key: v.target })
-                        names.push({ value: this.message[v.target].pinyin, key: v.target })
+                        if (this.message[v.target] != null) {
+                            this.message[v.target].hasOwnProperty("name") && names.push({ value: this.message[v.target].name, key: v.target })
+                            this.message[v.target].hasOwnProperty("pinyin") && names.push({ value: this.message[v.target].pinyin, key: v.target })
+                            if (this.message[v.target].hasOwnProperty("keywords")) {
+                                this.message[v.target].keywords.forEach(k => {
+                                    names.push({ value: k, key: v.target })
+                                })
+                                this.message[v.target].pinyins.forEach(k => {
+                                    names.push({ value: k, key: v.target })
+                                })
+                            }
+                        }
                     })
 
                     // 筛查
@@ -164,7 +188,10 @@ function init(message) {
                     var dis = ao.distinct(matches);
                     env.filter_select = dis.length > 0 ? this.message[dis[0]] : null;
 
-                    if (!env.filter_select) all(this.message)
+
+                    if (!env.filter_select) {
+                        all(this.message);
+                    }
                 } else {
                     all(this.message)
                 }
@@ -180,7 +207,7 @@ function init(message) {
                     var results = fuzzy.filter(value, env.names, options);
                     var matches = results.map(function (el) { return el.original.key });
                     var dis = ao.distinct(matches);
-                    for(let i = 0; i < dis.length; i++){
+                    for (let i = 0; i < dis.length; i++) {
                         i == 0 && (env.filter_select = d[dis[i]])
                         env.filters.push({ key: dis[i], ...d[dis[i]] })
                     }
@@ -242,7 +269,7 @@ function init(message) {
             },
             // 控制键盘移动
             keyboard_move(e) {
-                let csslist = ["inputbox", "input", "input_btn", "tran", "keyboard"];
+                let csslist = ["inputbox", "input", "input_btn", "tran", "keyboard"]; // 选择btn , "tips", "line", "btnbox"
                 let frag = false;
                 for (let i = 0; i < csslist.length; i++) {
                     if (csslist[i] != e.target.classList[0]) {
@@ -253,6 +280,22 @@ function init(message) {
                     }
                 }
                 env.keyboard = frag
+            },
+            // 控制选择区宽度
+            select_move() {
+                if(this.$refs.input.value == "") return;
+                let arr = this.$refs.tips;
+                console.log(arr.children.length >= 3, arr.children.length);
+                if (arr.children.length > 3) {
+                    let w = 0;
+                    for (let i = 0; i < arr.children.length; i++) {
+                        w += arr.children[i].clientWidth * 1;
+                    }
+                    if (w < window.innerWidth)  arr.style.width = 100 + "%"
+                    else arr.style.width = w / 1.5 + "px"
+                } else {
+                    arr.style.width = 100 + "%"
+                }
             }
         },
         mounted() {
@@ -266,6 +309,8 @@ function init(message) {
             // 控制键盘移动
             document.body.addEventListener("click", this.keyboard_move)
             document.body.addEventListener("touchstart", this.keyboard_move)
+
+            document.body.addEventListener("keyup", this.select_move)
 
             // 手部滑动，问答列表滚动暂停
             this.$refs.answerlist.addEventListener("touchmove", function (e) {
