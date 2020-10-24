@@ -758,9 +758,7 @@
             }
         }
 
-
-
-        @media all and (orientation : landscape) {
+        @media (orientation : landscape) {
             .shade_bg {
                 top: -450px;
                 left: -24%;
@@ -771,6 +769,20 @@
                 transform: rotate(40deg) scale(2.5);
             }
         }
+
+        @media (orientation : landscape) and (min-width: 1024px) {
+            .shade_bg {
+                top: -680px;
+                left: -40%;
+                transform-origin: 0 50%;
+            }
+
+            .shade_bg_animation {
+                transform: rotate(35deg) scale(2);
+            }
+        }
+
+
 
         /* svg */
         .st0 {
